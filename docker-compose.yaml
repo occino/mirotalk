@@ -1,0 +1,26 @@
+services:
+    mirotalk:
+        image: mirotalk/p2p:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: mirotalk
+        hostname: mirotalk
+        volumes:
+            - /home/nico/volumes/mirotalk/.env:/src/.env:ro
+        restart: unless-stopped
+        expose:
+             - 3000
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.mirotalk.rule=Host(`mirotalk.nico-nostheide.de`)"
+            - "traefik.http.routers.mirotalk.entrypoints=websecure"
+            - "traefik.http.routers.mirotalk.tls.certresolver=myresolver"
+            - "traefik.http.routers.mirotalk.service=mirotalk-srv"
+            - "traefik.http.services.mirotalk-srv.loadbalancer.server.port=3000"
+        networks:
+            - proxy
+
+networks:
+    proxy:
+        external: true
